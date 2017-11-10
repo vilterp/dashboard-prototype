@@ -6,6 +6,20 @@ function stringifyPath(path) {
   return path.map((elem) => `"${elem.replace(/"/, '"')}"`).join(',');
 }
 
+const EMPTY_STATS = {
+  QPS: 0,
+  gbUsed: 0,
+  gbCapacity: 0
+};
+
+function addStats(a, b) {
+  return {
+    QPS: a.QPS + b.QPS,
+    gbUsed: a.gbUsed + b.gbUsed,
+    gbCapacity: a.gbCapacity + b.gbCapacity
+  };
+}
+
 class TreeTable extends Component {
 
   constructor() {
@@ -55,20 +69,40 @@ class TreeTable extends Component {
     const output = [];
     const collapsedNodes = this.state.collapsedNodes;
     const hoveredNodes = this.state.hoveredNodes;
+
+    // stringified path => stats
+    const memoizedStats = {};
+
+    function getStats(node, strPathToNode) {
+      if (node.type === TYPE_NODE) {
+        return node.stats;
+      }
+      if (memoizedStats[strPathToNode]) {
+        return memoizedStats[strPathToNode];
+      }
+      let result = EMPTY_STATS;
+      node.children.forEach((childNode) => {
+        result = addStats(result, getStats(childNode));
+      });
+      return result;
+    }
+
     function recur(node, depth, pathSoFar) {
       const pathToThis = [];
       pathSoFar.forEach((pathElem) => { pathToThis.push(pathElem); }); // TODO: copy func somewhere?
       if (node.type !== TYPE_CLUSTER) {
         pathToThis.push(node.name);
       }
-      const nodeCollapsed = collapsedNodes.has(stringifyPath(pathToThis));
+      const strPathToThis = stringifyPath(pathToThis);
+      const nodeCollapsed = collapsedNodes.has(strPathToThis);
       if (node.type !== TYPE_CLUSTER) {
         output.push({
           depth: depth,
           node: node,
           path: pathToThis,
-          hovered: hoveredNodes.has(stringifyPath(pathToThis)),
-          collapsed: nodeCollapsed
+          hovered: hoveredNodes.has(strPathToThis),
+          collapsed: nodeCollapsed,
+          stats: getStats(node, strPathToThis)
         });
       }
       if (node.type !== TYPE_NODE && !nodeCollapsed) {
@@ -91,17 +125,15 @@ class TreeTable extends Component {
     const handleUnHover = this.handleUnHover.bind(this);
 
     return (
-      <table>
+      <table className="treetable">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Disk Used</th>
-            <th>Disk Capacity</th>
-            <th>Disk Usage %</th>
+            <th style={{ width: 300 }}>Name</th>
+            <th>CPU</th>
             <th>QPS</th>
-            <th># Ranges</th>
-            <th>Bytes In</th>
-            <th>Bytes Out</th>
+            <th>GB Used</th>
+            <th>GB Capacity</th>
+            <th>% GB Used</th>
           </tr>
         </thead>
         <tbody>
@@ -142,6 +174,8 @@ class Node extends Component {
       arrow = flattenedNode.collapsed ? '▶ ' : '▼ ';
     }
 
+    const stats = flattenedNode.stats;
+
     return (
       <tr
         className={trClassnames}
@@ -155,13 +189,11 @@ class Node extends Component {
         >
           {arrow}{node.name}
         </td>
-        <td>Disk Used</td>
-        <td>Disk Capacity</td>
-        <td>Disk Usage %</td>
-        <td>QPS</td>
-        <td># Ranges</td>
-        <td>Bytes In</td>
-        <td>Bytes Out</td>
+        <td className="treetable-stat">{node.type === TYPE_NODE ? `${Math.round(stats.CPU)}%` : ''}</td>
+        <td className="treetable-stat">{Math.round(stats.QPS)}</td>
+        <td className="treetable-stat">{Math.round(stats.gbUsed)}</td>
+        <td className="treetable-stat">{Math.round(stats.gbCapacity)}</td>
+        <td className="treetable-stat">{Math.floor(stats.gbUsed / stats.gbCapacity * 100)}</td>
       </tr>
     );
   }

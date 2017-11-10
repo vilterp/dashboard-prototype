@@ -21,11 +21,23 @@ const nodeTree =
               children: [
                 {
                   type: TYPE_NODE,
-                  name: '10.123.43.4'
+                  name: '10.123.43.4',
+                  stats: {
+                    CPU: Math.random() * 100,
+                    QPS: Math.random() * 50,
+                    gbUsed: Math.random() * 256,
+                    gbCapacity: 256
+                  }
                 },
                 {
                   type: TYPE_NODE,
-                  name: '10.123.43.5'
+                  name: '10.123.43.5',
+                  stats: {
+                    CPU: 34,
+                    QPS: Math.random() * 50,
+                    gbUsed: Math.random() * 256,
+                    gbCapacity: 256
+                  }
                 },
               ]
             },
@@ -35,11 +47,55 @@ const nodeTree =
               children: [
                 {
                   type: TYPE_NODE,
-                  name: '10.123.43.6'
+                  name: '10.123.43.6',
+                  stats: {
+                    CPU: 34,
+                    QPS: Math.random() * 50,
+                    gbUsed: Math.random() * 256,
+                    gbCapacity: 256
+                  }
                 },
                 {
                   type: TYPE_NODE,
-                  name: '10.123.43.7'
+                  name: '10.123.43.7',
+                  stats: {
+                    CPU: 34,
+                    QPS: Math.random() * 50,
+                    gbUsed: Math.random() * 256,
+                    gbCapacity: 256
+                  }
+                },
+              ]
+            }
+          ]
+        },
+        {
+          type: TYPE_LOCALITY,
+          name: 'us-west',
+          children: [
+            {
+              type: TYPE_LOCALITY,
+              name: 'us-west-1a',
+              children: [
+                {
+                  type: TYPE_NODE,
+                  name: '10.123.43.57',
+                  stats: {
+                    CPU: Math.random() * 100,
+                    QPS: Math.random() * 50,
+                    gbUsed: Math.random() * 256,
+                    gbCapacity: 256
+                  }
+                },
+                {
+                  type: TYPE_NODE,
+                  name: '10.123.43.58',
+                  stats: {
+                    CPU: Math.random() * 100,
+                    QPS: Math.random() * 50,
+                    gbUsed: Math.random() * 256,
+                    gbCapacity: 256
+                  }
                 },
               ]
             }
@@ -61,11 +117,23 @@ const nodeTree =
               children: [
                 {
                   type: TYPE_NODE,
-                  name: '10.123.43.8'
+                  name: '10.123.43.8',
+                  stats: {
+                    CPU: Math.random() * 100,
+                    QPS: Math.random() * 50,
+                    gbUsed: Math.random() * 256,
+                    gbCapacity: 256
+                  }
                 },
                 {
                   type: TYPE_NODE,
-                  name: '10.123.43.9'
+                  name: '10.123.43.9',
+                  stats: {
+                    CPU: Math.random() * 100,
+                    QPS: Math.random() * 50,
+                    gbUsed: Math.random() * 256,
+                    gbCapacity: 256
+                  }
                 },
               ]
             },
@@ -75,11 +143,23 @@ const nodeTree =
               children: [
                 {
                   type: TYPE_NODE,
-                  name: '10.123.43.10'
+                  name: '10.123.43.10',
+                  stats: {
+                    CPU: Math.random() * 100,
+                    QPS: Math.random() * 50,
+                    gbUsed: Math.random() * 256,
+                    gbCapacity: 256
+                  }
                 },
                 {
                   type: TYPE_NODE,
-                  name: '10.123.43.11'
+                  name: '10.123.43.11',
+                  stats: {
+                    CPU: Math.random() * 100,
+                    QPS: Math.random() * 50,
+                    gbUsed: Math.random() * 256,
+                    gbCapacity: 256
+                  }
                 },
               ]
             }

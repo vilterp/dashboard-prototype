@@ -6,3 +6,11 @@
 .treetable-node.hovered {
   background-color: rgb(213, 235, 241);
 }
+
+.treetable {
+  width: 1000px;
+}
+
+td.treetable-stat {
+  text-align: center;
+}
