@@ -1,9 +1,10 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
-import TreeTable, { stringifyPath, unStringifyPath, filterDescendentPaths } from './TreeTable';
+import TreeTable from './TreeTable';
+import { stringifyPath, unStringifyPath, filterDescendentPaths } from './types';
 import { TYPE_NODE } from './types';
 import nodeTree from './data'
-import map from './map.svg';
+import Map from './Map';
 import classNames from 'classnames';
 import './App.css';
 
@@ -60,6 +61,21 @@ function getLeafPaths(data, paths) {
   return output;
 }
 
+const nodesForTesting = [
+  {
+    path: ['Cluster', 'US'],
+    cityName: 'Omaha',
+  },
+  {
+    path: ['Cluster', 'EU'],
+    cityName: 'Berlin'
+  },
+  {
+    path: ['Cluster', 'China', 'Beijing'],
+    cityName: 'Beijing'
+  }
+];
+
 class App extends Component {
 
   constructor() {
@@ -112,15 +128,29 @@ class App extends Component {
     const handleHoverNode = this.handleHoverNode.bind(this);
     const handleUnHoverNode = this.handleUnHoverNode.bind(this);
 
+    function handleToggleUnBound(path) {
+      if (this.state.selectedNodes.has(stringifyPath(path))) {
+        handleUnSelectNode(path);
+      } else {
+        handleSelectNode(path);
+      }
+    }
+    const handleToggle = handleToggleUnBound.bind(this);
+
     let tabContents;
     switch (this.state.tab) {
       case TAB_MAP: {
         const hovered = this.state.hoveredNode;
         tabContents = (
-          <div>
-            <svg className="map" height="400px" width="800px">
-              <image href={map} height="400px" />
-            </svg>
+          <div style={{ margin: 10 }}>
+            <Map
+              nodes={nodesForTesting}
+              hoveredNode={this.state.hoveredNode}
+              selectedNodes={this.state.selectedNodes}
+              onHover={handleHoverNode}
+              onUnHover={handleUnHoverNode}
+              onClick={handleToggle}
+            />
             <p>Hovered: {hovered ? hovered.join('/') : '(none)'}</p>
           </div>
         );
@@ -184,6 +214,8 @@ class App extends Component {
         <div>
           <TreeTable
             nodes={nodeTree}
+            selectedNodes={this.state.selectedNodes}
+            hoveredNode={this.state.hoveredNode}
             onSelect={handleSelectNode}
             onUnSelect={handleUnSelectNode}
             onHover={handleHoverNode}

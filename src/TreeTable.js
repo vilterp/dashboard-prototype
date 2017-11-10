@@ -1,59 +1,20 @@
 import React, { Component } from 'react';
-import { TYPE_LOCALITY, TYPE_NODE } from './types';
+import {
+  TYPE_LOCALITY,
+  TYPE_NODE,
+  stringifyPath,
+  EMPTY_PATH,
+  addStats,
+  EMPTY_STATS
+} from './types';
 import classNames from 'classnames';
-
-export function stringifyPath(path) {
-  return JSON.stringify(path);
-}
-
-export function unStringifyPath(stringified) {
-  return JSON.parse(stringified);
-}
-
-function pathHasPrefix(path, prefix) {
-  for (let i = 0; i < prefix.length; i++) {
-    if (prefix[i] !== path[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-
-// filterDescendentPaths returns a new set with the paths that descend
-// from the given path filtered out.
-export function filterDescendentPaths(allPaths, path) {
-  const res = new Set([...allPaths].filter((curPathStr) => {
-    const curPath = unStringifyPath(curPathStr);
-    const isDescendant = curPath.length > path.length && pathHasPrefix(curPath, path);
-    return !isDescendant;
-  }));
-  return res;
-}
-
-const EMPTY_PATH = stringifyPath([]);
-
-const EMPTY_STATS = {
-  QPS: 0,
-  gbUsed: 0,
-  gbCapacity: 0
-};
-
-function addStats(a, b) {
-  return {
-    QPS: a.QPS + b.QPS,
-    gbUsed: a.gbUsed + b.gbUsed,
-    gbCapacity: a.gbCapacity + b.gbCapacity
-  };
-}
 
 class TreeTable extends Component {
 
   constructor() {
     super();
     this.state = {
-      collapsedNodes: new Set(),
-      hoveredNodes: new Set(),
-      selectedNodes: new Set() // just what the user has actually clicked on
+      collapsedNodes: new Set()
     };
   }
 
@@ -71,44 +32,24 @@ class TreeTable extends Component {
   }
 
   handleHover(path) {
-    const hovered = this.state.hoveredNodes;
-    hovered.add(stringifyPath(path));
-    this.setState({
-      hoveredNodes: hovered
-    });
     if (this.props.onHover) {
       this.props.onHover(path);
     }
   }
 
   handleUnHover(path) {
-    const hovered = this.state.hoveredNodes;
-    hovered.delete(stringifyPath(path));
-    this.setState({
-      hoveredNodes: hovered
-    });
     if (this.props.onUnHover) {
       this.props.onUnHover(path);
     }
   }
 
   handleSelect(path) {
-    const selected = this.state.selectedNodes;
-    selected.add(stringifyPath(path));
-    this.setState({
-      selectedNodes: filterDescendentPaths(selected, path)
-    });
     if (this.props.onSelect) {
       this.props.onSelect(path);
     }
   }
 
   handleUnSelect(path) {
-    const selected = this.state.selectedNodes;
-    selected.delete(stringifyPath(path));
-    this.setState({
-      selectedNodes: selected
-    });
     if (this.props.onUnSelect) {
       this.props.onUnSelect(path);
     }
@@ -117,8 +58,8 @@ class TreeTable extends Component {
   flatten(nodeTree) {
     const output = [];
     const collapsedNodes = this.state.collapsedNodes;
-    const hoveredNodes = this.state.hoveredNodes;
-    const selectedNodes = this.state.selectedNodes;
+    const hoveredNode = this.props.hoveredNode;
+    const selectedNodes = this.props.selectedNodes;
 
     // stringified path => stats
     const memoizedStats = {};
@@ -143,11 +84,14 @@ class TreeTable extends Component {
       const strPathToThis = stringifyPath(pathToThis);
       const nodeCollapsed = collapsedNodes.has(strPathToThis);
       const nodeSelected = selectedNodes.has(strPathToThis);
+      const nodeIsHovered = (
+        hoveredNode !== null && stringifyPath(hoveredNode) === strPathToThis
+      );
       output.push({
         depth: depth,
         node: node,
         path: pathToThis,
-        hovered: hoveredNodes.has(strPathToThis),
+        hovered: nodeIsHovered,
         collapsed: nodeCollapsed,
         selected: nodeSelected || parentSelected,
         stats: getStats(node, strPathToThis)

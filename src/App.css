@@ -16,7 +16,7 @@
 
 .treetable thead {
   background-color: #f5f5f5;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid lightgrey;
 }
 
 .treetable th {
@@ -33,6 +33,7 @@ td.treetable-stat {
 }
 
 .treetable {
+  border-top: 1px solid lightgrey;
   border-bottom: 1px solid lightgrey;
 }
 

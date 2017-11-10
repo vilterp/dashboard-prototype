@@ -11,6 +11,7 @@ const nodeTree = {
         {
           type: TYPE_LOCALITY,
           name: 'us-east',
+          cityName: 'Washington, D.C.',
           children: [
             {
               type: TYPE_LOCALITY,
@@ -69,6 +70,7 @@ const nodeTree = {
         {
           type: TYPE_LOCALITY,
           name: 'us-west',
+          cityName: 'Seattle',
           children: [
             {
               type: TYPE_LOCALITY,
@@ -107,6 +109,7 @@ const nodeTree = {
         {
           type: TYPE_LOCALITY,
           name: 'eu-east',
+          cityName: 'Berlin',
           children: [
             {
               type: TYPE_LOCALITY,

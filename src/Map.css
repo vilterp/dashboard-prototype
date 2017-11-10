@@ -1,0 +1,19 @@
+.map-node {
+  fill: red;
+}
+
+.map-node text {
+  fill: black;
+}
+
+.map-node.selected {
+  fill: blue;
+}
+
+.map-node.hovered {
+  fill: green;
+}
+
+.map-node.hovered.selected {
+  fill: darkblue;
+}
