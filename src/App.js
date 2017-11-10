@@ -2,6 +2,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import TreeTable from './TreeTable';
 import MultiTimeSeries from './MultiTimeSeries';
+import Matrix from './Matrix';
 import Map from './Map';
 import { stringifyPath, unStringifyPath, filterDescendentPaths } from './types';
 import { TYPE_NODE } from './types';
@@ -122,21 +123,24 @@ class App extends Component {
     });
   }
 
+  handleToggleSelected(path) {
+    if (this.state.selectedNodes.has(stringifyPath(path))) {
+      this.handleUnSelectNode(path);
+    } else {
+      this.handleSelectNode(path);
+    }
+  }
+
   render() {
     const handleChangeTab = this.handleChangeTab.bind(this);
     const handleSelectNode = this.handleSelectNode.bind(this);
     const handleUnSelectNode = this.handleUnSelectNode.bind(this);
     const handleHoverNode = this.handleHoverNode.bind(this);
     const handleUnHoverNode = this.handleUnHoverNode.bind(this);
+    const handleToggle = this.handleToggleSelected.bind(this);
 
-    function handleToggleUnBound(path) {
-      if (this.state.selectedNodes.has(stringifyPath(path))) {
-        handleUnSelectNode(path);
-      } else {
-        handleSelectNode(path);
-      }
-    }
-    const handleToggle = handleToggleUnBound.bind(this);
+    const selectedNodes = Array.from(this.state.selectedNodes).map(unStringifyPath);
+    const leafPaths = getLeafPaths(nodeTree, selectedNodes);
 
     let tabContents;
     switch (this.state.tab) {
@@ -156,8 +160,6 @@ class App extends Component {
         break;
       }
       case TAB_TS: {
-        const selectedNodes = Array.from(this.state.selectedNodes).map(unStringifyPath);
-        const leafPaths = getLeafPaths(nodeTree, selectedNodes);
         tabContents = (
           <div style={{ height: 400, overflow: 'scroll' }}>
             <MultiTimeSeries
@@ -172,8 +174,13 @@ class App extends Component {
       }
       case TAB_MATRIX:
         tabContents = (
-          <div style={{ height: 400 }}>
-            <p>(Node replication / latency / throughput matrix)</p>
+          <div style={{ height: 400, overflow: 'scroll' }}>
+            <Matrix
+              selectedNodes={leafPaths}
+              hoveredNode={this.state.hoveredNode}
+              onHover={handleHoverNode}
+              onUnHover={handleUnHoverNode}
+            />
           </div>
         );
         break;
