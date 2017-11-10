@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TYPE_CLUSTER, TYPE_LOCALITY, TYPE_NODE } from './types';
+import { TYPE_LOCALITY, TYPE_NODE } from './types';
 import classNames from 'classnames';
 
 function stringifyPath(path) {
@@ -90,28 +90,24 @@ class TreeTable extends Component {
     function recur(node, depth, pathSoFar) {
       const pathToThis = [];
       pathSoFar.forEach((pathElem) => { pathToThis.push(pathElem); }); // TODO: copy func somewhere?
-      if (node.type !== TYPE_CLUSTER) {
-        pathToThis.push(node.name);
-      }
+      pathToThis.push(node.name);
       const strPathToThis = stringifyPath(pathToThis);
       const nodeCollapsed = collapsedNodes.has(strPathToThis);
-      if (node.type !== TYPE_CLUSTER) {
-        output.push({
-          depth: depth,
-          node: node,
-          path: pathToThis,
-          hovered: hoveredNodes.has(strPathToThis),
-          collapsed: nodeCollapsed,
-          stats: getStats(node, strPathToThis)
-        });
-      }
+      output.push({
+        depth: depth,
+        node: node,
+        path: pathToThis,
+        hovered: hoveredNodes.has(strPathToThis),
+        collapsed: nodeCollapsed,
+        stats: getStats(node, strPathToThis)
+      });
       if (node.type !== TYPE_NODE && !nodeCollapsed) {
         node.children.forEach((childNode) => {
           recur(childNode, depth + 1, pathToThis);
         });
       }
     }
-    recur(nodeTree, -1, []);
+    recur(nodeTree, 0, []);
     return output;
   }
 

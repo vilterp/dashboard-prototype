@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import TreeTable from './TreeTable';
-import { TYPE_CLUSTER, TYPE_LOCALITY, TYPE_NODE } from './types';
+import { TYPE_LOCALITY, TYPE_NODE } from './types';
 import './App.css';
 
 const nodeTree =
 {
-  type: TYPE_CLUSTER,
+  type: TYPE_LOCALITY,
+  name: 'Cluster',
   children: [
     {
       type: TYPE_LOCALITY,
