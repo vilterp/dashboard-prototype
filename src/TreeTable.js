@@ -197,7 +197,7 @@ class Node extends Component {
           <input
             type="checkbox"
             checked={flattenedNode.selected}
-            onClick={toggleSelected}
+            onChange={toggleSelected}
           />
         </td>
         <td

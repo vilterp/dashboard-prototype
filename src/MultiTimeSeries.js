@@ -23,7 +23,7 @@ class MultiTimeSeries extends Component {
 
     if (selectedNodes.length === 0) {
       return (
-        <p style={{ padding: 200 }}>Select some nodes with the checkboxes.</p>
+        <p style={{ padding: 150 }}>Select some nodes with the checkboxes.</p>
       )
     }
 

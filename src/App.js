@@ -39,28 +39,74 @@ const nodesForTesting = [
   }
 ];
 
+function stateToUrl(state) {
+  const tabName = state.tab.toLowerCase();
+  return `/${tabName}/${Array.from(state.selectedNodes).join(';')}`;
+}
+
+function stateFromUrl(url) {
+  const segments = url.split('/');
+  segments.splice(0, 1); // remove initial ''
+  const result = {
+    tab: TAB_MAP,
+    hoveredNodes: new Set(),
+    selectedNodes: new Set()
+  }
+  if (segments.length > 0 && segments[0].length > 0) {
+    result.tab = segments[0].toUpperCase();
+  }
+  if (segments.length > 1 && segments[1].length > 0) {
+    const selected = segments[1].split(';');
+    result.selectedNodes = new Set(selected);
+  }
+  console.log(result);
+  return result;
+}
+
+function pushWindowState(state) {
+  window.history.pushState(state, '', stateToUrl(state));
+}
+
 class App extends Component {
 
   constructor() {
     super();
-    this.state = {
-      tab: TAB_MAP,
-      selectedNodes: new Set(),
-      hoveredNodes: new Set()
-    };
+    this.state = stateFromUrl(decodeURI(window.location.pathname));
+  }
+
+  componentDidMount() {
+    window.addEventListener('popstate', (evt) => {
+      this.setStateFromWindow(evt.state);
+    });
+  }
+
+  setStateFromWindow(state) {
+    this.setState({
+      tab: state.tab,
+      selectedNodes: state.selectedNodes
+    });
   }
 
   handleChangeTab(tabId) {
     this.setState({
       tab: tabId
     });
+    pushWindowState({
+      tab: tabId,
+      selectedNodes: this.state.selectedNodes
+    });
   }
 
   handleSelectNode(path) {
     const selected = this.state.selectedNodes;
     selected.add(stringifyPath(path));
+    const filteredSelectedNodes = filterDescendentPaths(selected, path);
     this.setState({
-      selectedNodes: filterDescendentPaths(selected, path)
+      selectedNodes: filteredSelectedNodes
+    });
+    pushWindowState({
+      tab: this.state.tab,
+      selectedNodes: new Set([...filteredSelectedNodes])
     });
   }
 
@@ -69,6 +115,10 @@ class App extends Component {
     selected.delete(stringifyPath(path));
     this.setState({
       selectedNodes: selected
+    });
+    pushWindowState({
+      tab: this.state.tab,
+      selectedNodes: new Set([...selected])
     });
   }
 
@@ -148,7 +198,7 @@ class App extends Component {
         );
         break;
       default:
-        console.error('unknown tab');
+        console.error('unknown tab', this.state.tab);
         tabContents = null;
     }
 
