@@ -121,7 +121,7 @@ class TreeTable extends Component {
     const handleUnHover = this.handleUnHover.bind(this);
 
     return (
-      <table className="treetable">
+      <table className="table-compact treetable">
         <thead>
           <tr>
             <th style={{ width: 300 }}>Name</th>
