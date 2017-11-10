@@ -1,10 +1,11 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import TreeTable from './TreeTable';
+import MultiTimeSeries from './MultiTimeSeries';
+import Map from './Map';
 import { stringifyPath, unStringifyPath, filterDescendentPaths } from './types';
 import { TYPE_NODE } from './types';
 import nodeTree from './data'
-import Map from './Map';
 import classNames from 'classnames';
 import './App.css';
 
@@ -140,7 +141,6 @@ class App extends Component {
     let tabContents;
     switch (this.state.tab) {
       case TAB_MAP: {
-        const hovered = this.state.hoveredNode;
         tabContents = (
           <div style={{ margin: 10 }}>
             <Map
@@ -151,7 +151,6 @@ class App extends Component {
               onUnHover={handleUnHoverNode}
               onClick={handleToggle}
             />
-            <p>Hovered: {hovered ? hovered.join('/') : '(none)'}</p>
           </div>
         );
         break;
@@ -160,22 +159,13 @@ class App extends Component {
         const selectedNodes = Array.from(this.state.selectedNodes).map(unStringifyPath);
         const leafPaths = getLeafPaths(nodeTree, selectedNodes);
         tabContents = (
-          <div style={{ height: 400 }}>
-            <p>Imagine some pretty time series here</p>
-            <p>Of nodes:</p>
-            <ul>
-              {Array.from(leafPaths).map((path) => (
-                <li key={path.join('/')}>{path.join('/')}</li>
-              ))}
-            </ul>
-            <p>Of metrics:</p>
-            <ul>
-              <li>CPU</li>
-              <li>QPS</li>
-              <li>GB Used</li>
-              <li>GB Available</li>
-              <li>% GB Used</li>
-            </ul>
+          <div style={{ height: 400, overflow: 'scroll' }}>
+            <MultiTimeSeries
+              hoveredNode={this.state.hoveredNode}
+              selectedNodes={leafPaths}
+              onHover={handleHoverNode}
+              onUnHover={handleUnHoverNode}
+            />
           </div>
         );
         break;
@@ -210,6 +200,7 @@ class App extends Component {
             ))}
           </ul>
           {tabContents}
+          <p>Hovered: {this.state.hoveredNode ? this.state.hoveredNode.join('/') : '(none)'}</p>
         </div>
         <div>
           <TreeTable

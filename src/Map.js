@@ -86,12 +86,6 @@ class Map extends Component {
             const isHovered = (
               hoveredNode !== null && pathHasPrefix(hoveredNode, node.path)
             );
-            console.log(
-              'hovered',
-              hoveredNode === null ? null : stringifyPath(hoveredNode),
-              'me', stringifyPath(node.path),
-              isHovered
-            );
             return (
               <g
                 key={stringifyPath(node.path)}
