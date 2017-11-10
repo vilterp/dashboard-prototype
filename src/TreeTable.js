@@ -129,6 +129,7 @@ class TreeTable extends Component {
             <th>GB Used</th>
             <th>GB Capacity</th>
             <th>% GB Used</th>
+            <th># Ranges</th>
           </tr>
         </thead>
         <tbody>
@@ -211,6 +212,7 @@ class Node extends Component {
         <td className="treetable-stat">{Math.round(stats.gbUsed)}</td>
         <td className="treetable-stat">{Math.round(stats.gbCapacity)}</td>
         <td className="treetable-stat">{Math.floor(stats.gbUsed / stats.gbCapacity * 100)}</td>
+        <td className="treetable-stat">{stats.ranges}</td>
       </tr>
     );
   }

@@ -176,7 +176,7 @@ class App extends Component {
       }
       case TAB_MATRIX:
         tabContents = (
-          <div style={{ height: 400, overflow: 'scroll' }}>
+          <div style={{ minHeight: 400 }}>
             <Matrix
               selectedNodes={leafPaths}
               hoveredNodes={this.state.hoveredNodes}

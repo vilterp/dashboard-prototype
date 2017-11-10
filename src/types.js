@@ -34,13 +34,15 @@ export const EMPTY_PATH = stringifyPath([]);
 export const EMPTY_STATS = {
   QPS: 0,
   gbUsed: 0,
-  gbCapacity: 0
+  gbCapacity: 0,
+  ranges: 0
 };
 
 export function addStats(a, b) {
   return {
     QPS: a.QPS + b.QPS,
     gbUsed: a.gbUsed + b.gbUsed,
-    gbCapacity: a.gbCapacity + b.gbCapacity
+    gbCapacity: a.gbCapacity + b.gbCapacity,
+    ranges: a.ranges + b.ranges
   };
 }

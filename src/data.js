@@ -24,7 +24,8 @@ const nodeTree = {
                     CPU: Math.random() * 100,
                     QPS: Math.random() * 50,
                     gbUsed: Math.random() * 256,
-                    gbCapacity: 256
+                    gbCapacity: 256,
+                    ranges: Math.round(Math.random() * 1000)
                   }
                 },
                 {
@@ -34,7 +35,8 @@ const nodeTree = {
                     CPU: 34,
                     QPS: Math.random() * 50,
                     gbUsed: Math.random() * 256,
-                    gbCapacity: 256
+                    gbCapacity: 256,
+                    ranges: Math.round(Math.random() * 1000)
                   }
                 },
               ]
@@ -50,7 +52,8 @@ const nodeTree = {
                     CPU: 34,
                     QPS: Math.random() * 50,
                     gbUsed: Math.random() * 256,
-                    gbCapacity: 256
+                    gbCapacity: 256,
+                    ranges: Math.round(Math.random() * 1000)
                   }
                 },
                 {
@@ -60,7 +63,8 @@ const nodeTree = {
                     CPU: 34,
                     QPS: Math.random() * 50,
                     gbUsed: Math.random() * 256,
-                    gbCapacity: 256
+                    gbCapacity: 256,
+                    ranges: Math.round(Math.random() * 1000)
                   }
                 },
               ]
@@ -83,7 +87,8 @@ const nodeTree = {
                     CPU: Math.random() * 100,
                     QPS: Math.random() * 50,
                     gbUsed: Math.random() * 256,
-                    gbCapacity: 256
+                    gbCapacity: 256,
+                    ranges: Math.round(Math.random() * 1000)
                   }
                 },
                 {
@@ -93,7 +98,8 @@ const nodeTree = {
                     CPU: Math.random() * 100,
                     QPS: Math.random() * 50,
                     gbUsed: Math.random() * 256,
-                    gbCapacity: 256
+                    gbCapacity: 256,
+                    ranges: Math.round(Math.random() * 1000)
                   }
                 },
               ]
@@ -122,7 +128,8 @@ const nodeTree = {
                     CPU: Math.random() * 100,
                     QPS: Math.random() * 50,
                     gbUsed: Math.random() * 256,
-                    gbCapacity: 256
+                    gbCapacity: 256,
+                    ranges: Math.round(Math.random() * 1000)
                   }
                 },
                 {
@@ -132,7 +139,8 @@ const nodeTree = {
                     CPU: Math.random() * 100,
                     QPS: Math.random() * 50,
                     gbUsed: Math.random() * 256,
-                    gbCapacity: 256
+                    gbCapacity: 256,
+                    ranges: Math.round(Math.random() * 1000)
                   }
                 },
               ]
@@ -148,7 +156,8 @@ const nodeTree = {
                     CPU: Math.random() * 100,
                     QPS: Math.random() * 50,
                     gbUsed: Math.random() * 256,
-                    gbCapacity: 256
+                    gbCapacity: 256,
+                    ranges: Math.round(Math.random() * 1000)
                   }
                 },
                 {
@@ -158,7 +167,8 @@ const nodeTree = {
                     CPU: Math.random() * 100,
                     QPS: Math.random() * 50,
                     gbUsed: Math.random() * 256,
-                    gbCapacity: 256
+                    gbCapacity: 256,
+                    ranges: Math.round(Math.random() * 1000)
                   }
                 },
               ]
