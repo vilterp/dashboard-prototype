@@ -1,4 +1,4 @@
-import { TYPE_LOCALITY, TYPE_NODE } from './types';
+import { TYPE_LOCALITY, TYPE_NODE } from './nodes';
 
 const nodeTree = {
   type: TYPE_LOCALITY,

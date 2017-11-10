@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
-import { stringifyPath } from './types';
+import { stringifyPath } from './nodes';
 import './MultiTimeSeries.css';
 
 class MultiTimeSeries extends Component {

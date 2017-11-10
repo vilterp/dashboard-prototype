@@ -6,7 +6,7 @@ import {
   EMPTY_PATH,
   addStats,
   EMPTY_STATS
-} from './types';
+} from './nodes';
 import classNames from 'classnames';
 import './TreeTable.css';
 

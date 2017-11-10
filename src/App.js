@@ -4,8 +4,12 @@ import TreeTable from './TreeTable';
 import MultiTimeSeries from './MultiTimeSeries';
 import Matrix from './Matrix';
 import Map from './Map';
-import { stringifyPath, unStringifyPath, filterDescendentPaths } from './types';
-import { TYPE_NODE } from './types';
+import {
+  stringifyPath,
+  unStringifyPath,
+  getLeafPaths,
+  filterDescendentPaths
+} from './nodes';
 import nodeTree from './data'
 import classNames from 'classnames';
 import './App.css';
@@ -19,49 +23,6 @@ const TABS = {
   [TAB_TS]: 'Time Series',
   [TAB_MATRIX]: 'Matrix'
 };
-
-function findNode(root, path) {
-  function recur(curNode, pathInd) {
-    if (pathInd === path.length) {
-      return curNode;
-    }
-    const curPathElem = path[pathInd];
-    for (const child of curNode.children) {
-      if (child.name === curPathElem) {
-        return recur(child, pathInd + 1)
-      }
-    }
-  }
-  return recur(root, 1);
-}
-
-function getLeafPathsFromNode(node, pathToNode) {
-  const output = [];
-  function recur(curNode, pathToCurNode) {
-    if (curNode.type === TYPE_NODE) {
-      output.push(pathToCurNode);
-      return;
-    }
-    curNode.children.forEach((child) => {
-      const pathToChild = [...pathToCurNode, child.name];
-      recur(child, pathToChild);
-    });
-  }
-  recur(node, pathToNode);
-  return output;
-}
-
-function getLeafPaths(data, paths) {
-  const output = new Set();
-  paths.forEach((path) => {
-    const node = findNode(data, path);
-    const leafPaths = getLeafPathsFromNode(node, path);
-    leafPaths.forEach((path) => {
-      output.add(path);
-    });
-  })
-  return output;
-}
 
 const nodesForTesting = [
   {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
-import { stringifyPath, unStringifyPath, pathHasPrefix } from './types';
+import { stringifyPath, unStringifyPath, pathHasPrefix } from './nodes';
 import worldBoundaries from './assets/world';
 import * as Cities from './assets/cities100000';
 import * as d3 from 'd3';

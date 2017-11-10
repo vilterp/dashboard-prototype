@@ -46,3 +46,46 @@ export function addStats(a, b) {
     ranges: a.ranges + b.ranges
   };
 }
+
+function findNode(root, path) {
+  function recur(curNode, pathInd) {
+    if (pathInd === path.length) {
+      return curNode;
+    }
+    const curPathElem = path[pathInd];
+    for (const child of curNode.children) {
+      if (child.name === curPathElem) {
+        return recur(child, pathInd + 1)
+      }
+    }
+  }
+  return recur(root, 1);
+}
+
+function getLeafPathsFromNode(node, pathToNode) {
+  const output = [];
+  function recur(curNode, pathToCurNode) {
+    if (curNode.type === TYPE_NODE) {
+      output.push(pathToCurNode);
+      return;
+    }
+    curNode.children.forEach((child) => {
+      const pathToChild = [...pathToCurNode, child.name];
+      recur(child, pathToChild);
+    });
+  }
+  recur(node, pathToNode);
+  return output;
+}
+
+export function getLeafPaths(data, paths) {
+  const output = new Set();
+  paths.forEach((path) => {
+    const node = findNode(data, path);
+    const leafPaths = getLeafPathsFromNode(node, path);
+    leafPaths.forEach((path) => {
+      output.add(path);
+    });
+  })
+  return output;
+}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { stringifyPath } from './types';
+import { stringifyPath } from './nodes';
 import classNames from 'classnames';
 import './Matrix.css';
 
