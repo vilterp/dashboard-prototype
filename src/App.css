@@ -1,0 +1,8 @@
+.treetable-node.locality .treetable-node-name {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.treetable-node.hovered {
+  background-color: rgb(213, 235, 241);
+}
