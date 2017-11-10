@@ -21,7 +21,7 @@
 }
 
 td.treetable-stat {
-  text-align: center;
+  padding-left: 4px;
 }
 
 .treetable td, .treetable th {

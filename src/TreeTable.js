@@ -124,6 +124,7 @@ class TreeTable extends Component {
       <table className="table-compact treetable">
         <thead>
           <tr>
+            <th></th>
             <th style={{ width: 300 }}>Name</th>
             <th>CPU</th>
             <th>QPS</th>
