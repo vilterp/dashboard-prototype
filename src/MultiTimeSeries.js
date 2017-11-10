@@ -18,7 +18,14 @@ class MultiTimeSeries extends Component {
   }
 
   render() {
-    const { selectedNodes, hoveredNodes } = this.props;
+    const { selectedNodes: selectedNodesSet, hoveredNodes } = this.props;
+    const selectedNodes = Array.from(selectedNodesSet);
+
+    if (selectedNodes.length === 0) {
+      return (
+        <p style={{ padding: 200 }}>Select some nodes with the checkboxes.</p>
+      )
+    }
 
     const handleHover = this.handleHover.bind(this);
     const handleUnHover = this.handleUnHover.bind(this);
@@ -28,7 +35,7 @@ class MultiTimeSeries extends Component {
         <p>Imagine some pretty time series here</p>
         <p>Of nodes:</p>
         <ul>
-          {Array.from(selectedNodes).map((path) => {
+          {selectedNodes.map((path) => {
             const isHovered = hoveredNodes.has(stringifyPath(path));
             return (
               <li

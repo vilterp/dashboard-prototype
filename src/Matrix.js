@@ -21,6 +21,12 @@ class Matrix extends Component {
     const { selectedNodes: selectedSet, hoveredNodes } = this.props;
     const selectedNodes = Array.from(selectedSet);
 
+    if (selectedNodes.length === 0) {
+      return (
+        <p style={{ padding: 200 }}>Select some nodes with the checkboxes.</p>
+      )
+    }
+
     const handleHover = this.handleHover.bind(this);
     const handleUnHover = this.handleUnHover.bind(this);
 
