@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
-import { stringifyPath, pathHasPrefix } from './types';
+import { stringifyPath, unStringifyPath, pathHasPrefix } from './types';
 import worldBoundaries from './assets/world';
 import * as Cities from './assets/cities100000';
 import * as d3 from 'd3';
@@ -68,7 +68,7 @@ class Map extends Component {
   }
 
   render() {
-    const { nodes, hoveredNode } = this.props;
+    const { nodes, hoveredNodes } = this.props;
 
     const handleClick = this.handleClick.bind(this);
     const handleHover = this.handleHover.bind(this);
@@ -83,9 +83,9 @@ class Map extends Component {
             const [x, y] = coordsForCity(node.cityName);
             const name = node.path[node.path.length - 1];
             const isSelected = this.props.selectedNodes.has(stringifyPath(node.path));
-            const isHovered = (
-              hoveredNode !== null && pathHasPrefix(hoveredNode, node.path)
-            );
+            const isHovered = Array.from(hoveredNodes).some((hoveredPath) => (
+              pathHasPrefix(unStringifyPath(hoveredPath), node.path)
+            ))
             return (
               <g
                 key={stringifyPath(node.path)}

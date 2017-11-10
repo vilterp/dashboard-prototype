@@ -85,7 +85,7 @@ class App extends Component {
     this.state = {
       tab: TAB_MAP,
       selectedNodes: new Set(),
-      hoveredNode: null
+      hoveredNodes: new Set()
     };
   }
 
@@ -112,14 +112,16 @@ class App extends Component {
   }
 
   handleHoverNode(path) {
+    this.state.hoveredNodes.add(stringifyPath(path));
     this.setState({
-      hoveredNode: path
+      hoveredNodes: this.state.hoveredNodes
     });
   }
 
   handleUnHoverNode(path) {
+    this.state.hoveredNodes.delete(stringifyPath(path));
     this.setState({
-      hoveredNode: null
+      hoveredNodes: this.state.hoveredNodes
     });
   }
 
@@ -149,7 +151,7 @@ class App extends Component {
           <div style={{ margin: 10 }}>
             <Map
               nodes={nodesForTesting}
-              hoveredNode={this.state.hoveredNode}
+              hoveredNodes={this.state.hoveredNodes}
               selectedNodes={this.state.selectedNodes}
               onHover={handleHoverNode}
               onUnHover={handleUnHoverNode}
@@ -163,7 +165,7 @@ class App extends Component {
         tabContents = (
           <div style={{ height: 400, overflow: 'scroll' }}>
             <MultiTimeSeries
-              hoveredNode={this.state.hoveredNode}
+              hoveredNodes={this.state.hoveredNodes}
               selectedNodes={leafPaths}
               onHover={handleHoverNode}
               onUnHover={handleUnHoverNode}
@@ -177,7 +179,7 @@ class App extends Component {
           <div style={{ height: 400, overflow: 'scroll' }}>
             <Matrix
               selectedNodes={leafPaths}
-              hoveredNode={this.state.hoveredNode}
+              hoveredNodes={this.state.hoveredNodes}
               onHover={handleHoverNode}
               onUnHover={handleUnHoverNode}
             />
@@ -207,13 +209,18 @@ class App extends Component {
             ))}
           </ul>
           {tabContents}
-          <p>Hovered: {this.state.hoveredNode ? this.state.hoveredNode.join('/') : '(none)'}</p>
+          <p>
+            Hovered:{' '}
+            {Array.from(this.state.hoveredNodes).map((path) =>
+              unStringifyPath(path).join('/')
+            ).join(', ')}
+          </p>
         </div>
         <div>
           <TreeTable
             nodes={nodeTree}
             selectedNodes={this.state.selectedNodes}
-            hoveredNode={this.state.hoveredNode}
+            hoveredNodes={this.state.hoveredNodes}
             onSelect={handleSelectNode}
             onUnSelect={handleUnSelectNode}
             onHover={handleHoverNode}

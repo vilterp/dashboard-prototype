@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { stringifyPath } from './types';
+import classNames from 'classnames';
 import './Matrix.css';
 
 class Matrix extends Component {
@@ -17,8 +18,11 @@ class Matrix extends Component {
   }
 
   render() {
-    const { selectedNodes: selectedSet, hoveredNode } = this.props;
+    const { selectedNodes: selectedSet, hoveredNodes } = this.props;
     const selectedNodes = Array.from(selectedSet);
+
+    const handleHover = this.handleHover.bind(this);
+    const handleUnHover = this.handleUnHover.bind(this);
 
     return (
       <div>
@@ -27,7 +31,12 @@ class Matrix extends Component {
             <tr>
               <th></th>
               {selectedNodes.map((colNodePath) => (
-                <th key={stringifyPath(colNodePath)}>
+                <th
+                  key={stringifyPath(colNodePath)}
+                  className={classNames({ hovered: hoveredNodes.has(stringifyPath(colNodePath)) })}
+                  onMouseOver={() => handleHover(colNodePath)}
+                  onMouseOut={() => handleUnHover(colNodePath)}
+                >
                   {nodeName(colNodePath)}
                 </th>
               ))}
@@ -36,10 +45,22 @@ class Matrix extends Component {
           <tbody>
             {selectedNodes.map((rowNodePath) => (
               <tr key={stringifyPath(rowNodePath)}>
-                <th>{nodeName(rowNodePath)}</th>
+                <th
+                  className={classNames({ hovered: hoveredNodes.has(stringifyPath(rowNodePath)) })}
+                  onMouseOver={() => handleHover(rowNodePath)}
+                  onMouseOut={() => handleUnHover(rowNodePath)}
+                >
+                  {nodeName(rowNodePath)}
+                </th>
                 {selectedNodes.map((colNodePath) => (
-                  <td key={stringifyPath(colNodePath)}>
-                    {Math.round(Math.random() * 100)}
+                  <td
+                    key={stringifyPath(colNodePath)}
+                    onMouseOver={() => { handleHover(rowNodePath); handleHover(colNodePath); }}
+                    onMouseOut={() => { handleUnHover(rowNodePath); handleUnHover(colNodePath); }}
+                  >
+                    {stringifyPath(rowNodePath) === stringifyPath(colNodePath)
+                      ? '-'
+                      : Math.round(Math.random() * 100)}
                   </td>
                 ))}
               </tr>

@@ -18,7 +18,7 @@ class MultiTimeSeries extends Component {
   }
 
   render() {
-    const { selectedNodes, hoveredNode } = this.props;
+    const { selectedNodes, hoveredNodes } = this.props;
 
     const handleHover = this.handleHover.bind(this);
     const handleUnHover = this.handleUnHover.bind(this);
@@ -29,7 +29,7 @@ class MultiTimeSeries extends Component {
         <p>Of nodes:</p>
         <ul>
           {Array.from(selectedNodes).map((path) => {
-            const isHovered = hoveredNode && stringifyPath(hoveredNode) === stringifyPath(path);
+            const isHovered = hoveredNodes.has(stringifyPath(path));
             return (
               <li
                 key={path.join('/')}

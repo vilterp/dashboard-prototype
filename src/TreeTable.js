@@ -8,6 +8,7 @@ import {
   EMPTY_STATS
 } from './types';
 import classNames from 'classnames';
+import './TreeTable.css';
 
 class TreeTable extends Component {
 
@@ -58,7 +59,7 @@ class TreeTable extends Component {
   flatten(nodeTree) {
     const output = [];
     const collapsedNodes = this.state.collapsedNodes;
-    const hoveredNode = this.props.hoveredNode;
+    const hoveredNodes = this.props.hoveredNodes;
     const selectedNodes = this.props.selectedNodes;
 
     // stringified path => stats
@@ -84,9 +85,9 @@ class TreeTable extends Component {
       const strPathToThis = stringifyPath(pathToThis);
       const nodeCollapsed = collapsedNodes.has(strPathToThis);
       const nodeSelected = selectedNodes.has(strPathToThis);
-      const nodeIsHovered = (
-        hoveredNode !== null && stringifyPath(hoveredNode) === strPathToThis
-      );
+      const nodeIsHovered = Array.from(hoveredNodes).some((hoveredPath) => (
+        hoveredPath === strPathToThis
+      ))
       output.push({
         depth: depth,
         node: node,
