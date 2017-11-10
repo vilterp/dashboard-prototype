@@ -2,9 +2,35 @@ import React, { Component } from 'react';
 import { TYPE_LOCALITY, TYPE_NODE } from './types';
 import classNames from 'classnames';
 
-function stringifyPath(path) {
-  return path.map((elem) => `"${elem.replace(/"/, '"')}"`).join(',');
+export function stringifyPath(path) {
+  return JSON.stringify(path);
 }
+
+export function unStringifyPath(stringified) {
+  return JSON.parse(stringified);
+}
+
+function pathHasPrefix(path, prefix) {
+  for (let i = 0; i < prefix.length; i++) {
+    if (prefix[i] !== path[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// filterDescendentPaths returns a new set with the paths that descend
+// from the given path filtered out.
+export function filterDescendentPaths(allPaths, path) {
+  const res = new Set([...allPaths].filter((curPathStr) => {
+    const curPath = unStringifyPath(curPathStr);
+    const isDescendant = curPath.length > path.length && pathHasPrefix(curPath, path);
+    return !isDescendant;
+  }));
+  return res;
+}
+
+const EMPTY_PATH = stringifyPath([]);
 
 const EMPTY_STATS = {
   QPS: 0,
@@ -26,7 +52,8 @@ class TreeTable extends Component {
     super();
     this.state = {
       collapsedNodes: new Set(),
-      hoveredNodes: new Set()
+      hoveredNodes: new Set(),
+      selectedNodes: new Set() // just what the user has actually clicked on
     };
   }
 
@@ -45,18 +72,18 @@ class TreeTable extends Component {
 
   handleHover(path) {
     const hovered = this.state.hoveredNodes;
-    this.state.hoveredNodes.add(stringifyPath(path));
+    hovered.add(stringifyPath(path));
     this.setState({
       hoveredNodes: hovered
     });
     if (this.props.onHover) {
-      this.props.onHover();
+      this.props.onHover(path);
     }
   }
 
   handleUnHover(path) {
     const hovered = this.state.hoveredNodes;
-    this.state.hoveredNodes.delete(stringifyPath(path));
+    hovered.delete(stringifyPath(path));
     this.setState({
       hoveredNodes: hovered
     });
@@ -65,10 +92,33 @@ class TreeTable extends Component {
     }
   }
 
+  handleSelect(path) {
+    const selected = this.state.selectedNodes;
+    selected.add(stringifyPath(path));
+    this.setState({
+      selectedNodes: filterDescendentPaths(selected, path)
+    });
+    if (this.props.onSelect) {
+      this.props.onSelect(path);
+    }
+  }
+
+  handleUnSelect(path) {
+    const selected = this.state.selectedNodes;
+    selected.delete(stringifyPath(path));
+    this.setState({
+      selectedNodes: selected
+    });
+    if (this.props.onUnSelect) {
+      this.props.onUnSelect(path);
+    }
+  }
+
   flatten(nodeTree) {
     const output = [];
     const collapsedNodes = this.state.collapsedNodes;
     const hoveredNodes = this.state.hoveredNodes;
+    const selectedNodes = this.state.selectedNodes;
 
     // stringified path => stats
     const memoizedStats = {};
@@ -87,27 +137,28 @@ class TreeTable extends Component {
       return result;
     }
 
-    function recur(node, depth, pathSoFar) {
-      const pathToThis = [];
-      pathSoFar.forEach((pathElem) => { pathToThis.push(pathElem); }); // TODO: copy func somewhere?
+    function recur(node, depth, pathSoFar, parentSelected) {
+      const pathToThis = [...pathSoFar];
       pathToThis.push(node.name);
       const strPathToThis = stringifyPath(pathToThis);
       const nodeCollapsed = collapsedNodes.has(strPathToThis);
+      const nodeSelected = selectedNodes.has(strPathToThis);
       output.push({
         depth: depth,
         node: node,
         path: pathToThis,
         hovered: hoveredNodes.has(strPathToThis),
         collapsed: nodeCollapsed,
+        selected: nodeSelected || parentSelected,
         stats: getStats(node, strPathToThis)
       });
       if (node.type !== TYPE_NODE && !nodeCollapsed) {
         node.children.forEach((childNode) => {
-          recur(childNode, depth + 1, pathToThis);
+          recur(childNode, depth + 1, pathToThis, parentSelected || nodeSelected);
         });
       }
     }
-    recur(nodeTree, 0, []);
+    recur(nodeTree, 0, [], selectedNodes.has(EMPTY_PATH));
     return output;
   }
 
@@ -119,6 +170,8 @@ class TreeTable extends Component {
     const handleToggle = this.handleToggle.bind(this);
     const handleHover = this.handleHover.bind(this);
     const handleUnHover = this.handleUnHover.bind(this);
+    const handleSelect = this.handleSelect.bind(this);
+    const handleUnSelect = this.handleUnSelect.bind(this);
 
     return (
       <table className="table-compact treetable">
@@ -138,9 +191,11 @@ class TreeTable extends Component {
             <Node
               key={flattenedNode.path.join('-')}
               flattenedNode={flattenedNode}
-              onToggle={handleToggle}
+              onToggleCollapsed={handleToggle}
               onHover={handleHover}
               onUnHover={handleUnHover}
+              onSelect={handleSelect}
+              onUnSelect={handleUnSelect}
             />
           ))}
         </tbody>
@@ -155,7 +210,14 @@ const INDENT_PX = 20;
 class Node extends Component {
 
   render() {
-    const { flattenedNode, onToggle, onHover, onUnHover } = this.props;
+    const {
+      flattenedNode,
+      onToggleCollapsed,
+      onHover,
+      onUnHover,
+      onSelect,
+      onUnSelect
+    } = this.props;
     const { node, depth, path } = flattenedNode;
 
     const trClassnames = classNames(
@@ -173,16 +235,29 @@ class Node extends Component {
 
     const stats = flattenedNode.stats;
 
+    const toggleSelected = () => flattenedNode.selected ? onUnSelect(path) : onSelect(path);
+
+    const onNameClick = node.type === TYPE_LOCALITY
+      ? () => { onToggleCollapsed(path) }
+      : toggleSelected;
+
     return (
       <tr
         className={trClassnames}
         onMouseOver={() => onHover(path)}
         onMouseOut={() => onUnHover(path)}
       >
+        <td style={{ textAlign: 'center' }}>
+          <input
+            type="checkbox"
+            checked={flattenedNode.selected}
+            onClick={toggleSelected}
+          />
+        </td>
         <td
           style={{ paddingLeft: depth * INDENT_PX }}
           className={'treetable-node-name'}
-          onClick={() => { onToggle(path) }}
+          onClick={onNameClick}
         >
           {arrow}{node.name}
         </td>

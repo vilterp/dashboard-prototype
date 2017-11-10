@@ -1,6 +1,9 @@
+.treetable-node-name {
+  cursor: pointer;
+}
+
 .treetable-node.locality .treetable-node-name {
   font-weight: bold;
-  cursor: pointer;
 }
 
 .treetable-node.hovered {
@@ -30,6 +33,9 @@ td.treetable-stat {
 }
 
 .treetable {
-  margin: 10px;
   border-bottom: 1px solid lightgrey;
+}
+
+.map {
+  margin: 10px;
 }
