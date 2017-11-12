@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
-import { stringifyPath } from './nodes';
+import { stringifyPath, unStringifyPath } from './nodes';
 import './MultiTimeSeries.css';
 
 class MultiTimeSeries extends Component {
@@ -18,8 +18,13 @@ class MultiTimeSeries extends Component {
   }
 
   render() {
-    const { selectedNodes: selectedNodesSet, hoveredNodes } = this.props;
-    const selectedNodes = Array.from(selectedNodesSet);
+    const {
+      selectedNodes: selectedNodesSet,
+      selectedMetrics: selectedMetricsSet,
+      hoveredNodes
+    } = this.props;
+    const selectedNodes = Array.from(selectedNodesSet).map(unStringifyPath);
+    const selectedMetrics = Array.from(selectedMetricsSet);
 
     if (selectedNodes.length === 0) {
       return (
@@ -32,32 +37,30 @@ class MultiTimeSeries extends Component {
 
     return (
       <div>
-        <p>Imagine some pretty time series here</p>
-        <p>Of nodes:</p>
         <ul>
-          {selectedNodes.map((path) => {
-            const isHovered = hoveredNodes.has(stringifyPath(path));
-            return (
-              <li
-                key={path.join('/')}
-                className={classNames('time-series-line', {
-                  hovered: isHovered
+          {selectedMetrics.map((metric) => (
+            <div key={metric}>
+              <h3>{metric}</h3>
+              Imagine a pretty time series here of this metric on nodes/regions:
+              <ul>
+                {selectedNodes.map((path) => {
+                  const isHovered = hoveredNodes.has(stringifyPath(path));
+                  return (
+                    <li
+                      key={path.join('/')}
+                      className={classNames('time-series-line', {
+                        hovered: isHovered
+                      })}
+                      onMouseOver={() => handleHover(path)}
+                      onMouseOut={() => handleUnHover(path)}
+                    >
+                      {path.join('/')}
+                    </li>
+                  );
                 })}
-                onMouseOver={() => handleHover(path)}
-                onMouseOut={() => handleUnHover(path)}
-              >
-                {path.join('/')}
-              </li>
-            );
-          })}
-        </ul>
-        <p>Of metrics:</p>
-        <ul>
-          <li>CPU</li>
-          <li>QPS</li>
-          <li>GB Used</li>
-          <li>GB Available</li>
-          <li>% GB Used</li>
+              </ul>
+            </div>
+          ))}
         </ul>
       </div>
     );

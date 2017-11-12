@@ -18,8 +18,8 @@ function coordsForCity(cityName) {
   return res;
 }
 
-const WIDTH = 1000;
-const HEIGHT = 500;
+const WIDTH = 800;
+const HEIGHT = 400;
 
 class WorldBoundaries extends Component {
 

@@ -39,34 +39,6 @@ const nodesForTesting = [
   }
 ];
 
-function stateToUrl(state) {
-  const tabName = state.tab.toLowerCase();
-  return `/${tabName}/${Array.from(state.selectedNodes).join(';')}`;
-}
-
-function stateFromUrl(url) {
-  const segments = url.split('/');
-  segments.splice(0, 1); // remove initial ''
-  const result = {
-    tab: TAB_MAP,
-    hoveredNodes: new Set(),
-    selectedNodes: new Set()
-  }
-  if (segments.length > 0 && segments[0].length > 0) {
-    result.tab = segments[0].toUpperCase();
-  }
-  if (segments.length > 1 && segments[1].length > 0) {
-    const selected = segments[1].split(';');
-    result.selectedNodes = new Set(selected);
-  }
-  console.log(result);
-  return result;
-}
-
-function pushWindowState(state) {
-  window.history.pushState(state, '', stateToUrl(state));
-}
-
 class App extends Component {
 
   constructor() {
@@ -144,6 +116,26 @@ class App extends Component {
     }
   }
 
+  handleAddMetric(metric) {
+    this.state.selectedMetrics.add(metric);
+    this.setState({
+      selectedMetrics: this.state.selectedMetrics
+    });
+  }
+
+  handleRemoveMetric(metric) {
+    this.state.selectedMetrics.delete(metric);
+    this.setState({
+      selectedMetrics: this.state.selectedMetrics
+    });
+  }
+
+  handleSetMetrics(metrics) {
+    this.setState({
+      selectedMetrics: metrics
+    });
+  }
+
   render() {
     const handleChangeTab = this.handleChangeTab.bind(this);
     const handleSelectNode = this.handleSelectNode.bind(this);
@@ -151,6 +143,9 @@ class App extends Component {
     const handleHoverNode = this.handleHoverNode.bind(this);
     const handleUnHoverNode = this.handleUnHoverNode.bind(this);
     const handleToggle = this.handleToggleSelected.bind(this);
+    const handleAddMetric = this.handleAddMetric.bind(this);
+    const handleRemoveMetric = this.handleRemoveMetric.bind(this);
+    const handleSetMetrics = this.handleSetMetrics.bind(this);
 
     const selectedNodes = Array.from(this.state.selectedNodes).map(unStringifyPath);
     const leafPaths = getLeafPaths(nodeTree, selectedNodes);
@@ -159,7 +154,7 @@ class App extends Component {
     switch (this.state.tab) {
       case TAB_MAP: {
         tabContents = (
-          <div style={{ margin: 10 }}>
+          <div style={{ height: 400 }}>
             <Map
               nodes={nodesForTesting}
               hoveredNodes={this.state.hoveredNodes}
@@ -177,7 +172,8 @@ class App extends Component {
           <div style={{ height: 400, overflow: 'scroll' }}>
             <MultiTimeSeries
               hoveredNodes={this.state.hoveredNodes}
-              selectedNodes={leafPaths}
+              selectedNodes={this.state.selectedNodes}
+              selectedMetrics={this.state.selectedMetrics}
               onHover={handleHoverNode}
               onUnHover={handleUnHoverNode}
             />
@@ -189,7 +185,7 @@ class App extends Component {
         tabContents = (
           <div style={{ minHeight: 400 }}>
             <Matrix
-              selectedNodes={leafPaths}
+              selectedNodes={this.state.selectedNodes}
               hoveredNodes={this.state.hoveredNodes}
               onHover={handleHoverNode}
               onUnHover={handleUnHoverNode}
@@ -220,27 +216,56 @@ class App extends Component {
             ))}
           </ul>
           {tabContents}
-          <p>
-            Hovered:{' '}
-            {Array.from(this.state.hoveredNodes).map((path) =>
-              unStringifyPath(path).join('/')
-            ).join(', ')}
-          </p>
         </div>
         <div>
           <TreeTable
             nodes={nodeTree}
             selectedNodes={this.state.selectedNodes}
+            selectedMetrics={this.state.selectedMetrics}
             hoveredNodes={this.state.hoveredNodes}
+            showCheckboxes={true}
             onSelect={handleSelectNode}
             onUnSelect={handleUnSelectNode}
             onHover={handleHoverNode}
             onUnHover={handleUnHoverNode}
+            onAddMetric={handleAddMetric}
+            onRemoveMetric={handleRemoveMetric}
+            onSetMetrics={handleSetMetrics}
+            onSelectTS={() => handleChangeTab(TAB_TS)}
           />
         </div>
       </div>
     );
   }
+}
+
+export function stateToUrl(state) {
+  const tabName = state.tab.toLowerCase();
+  return `/${tabName}/${Array.from(state.selectedNodes).join(';')}`;
+}
+
+export function stateFromUrl(url) {
+  const segments = url.split('/');
+  segments.splice(0, 1); // remove initial ''
+  const result = {
+    tab: TAB_MAP,
+    hoveredNodes: new Set(),
+    selectedNodes: new Set(),
+    selectedMetrics: new Set()
+  }
+  if (segments.length > 0 && segments[0].length > 0) {
+    result.tab = segments[0].toUpperCase();
+  }
+  if (segments.length > 1 && segments[1].length > 0) {
+    const selected = segments[1].split(';');
+    result.selectedNodes = new Set(selected);
+  }
+  console.log(result);
+  return result;
+}
+
+export function pushWindowState(state) {
+  window.history.pushState(state, '', stateToUrl(state));
 }
 
 export default App;

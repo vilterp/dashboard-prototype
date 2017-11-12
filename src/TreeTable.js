@@ -10,6 +10,15 @@ import {
 import classNames from 'classnames';
 import './TreeTable.css';
 
+const METRICS = [
+  { name: "CPU", extract: (stats, node) => node.type === TYPE_NODE ? `${Math.round(stats.CPU)}%` : '' },
+  { name: "QPS", extract: (stats) => Math.round(stats.QPS) },
+  { name: "GB Used", extract: (stats) => Math.round(stats.gbUsed) },
+  { name: "GB Capacity", extract: (stats) => Math.round(stats.gbCapacity) },
+  { name: "% GB Used", extract: (stats) => Math.floor(stats.gbUsed / stats.gbCapacity * 100) },
+  { name: "# Ranges", extract: (stats) => stats.ranges },
+];
+
 class TreeTable extends Component {
 
   constructor() {
@@ -19,7 +28,7 @@ class TreeTable extends Component {
     };
   }
 
-  handleToggle(path) {
+  handleToggleNode(path) {
     const collapsed = this.state.collapsedNodes;
     const stringified = stringifyPath(path);
     if (collapsed.has(stringified)) {
@@ -54,6 +63,30 @@ class TreeTable extends Component {
     if (this.props.onUnSelect) {
       this.props.onUnSelect(path);
     }
+  }
+
+  handleClickHeader(metricName) {
+    this.props.onSelectTS();
+    this.handleToggleMetric(metricName);
+  }
+
+  handleToggleMetric(metricName) {
+    const metricSelected = this.props.selectedMetrics.has(metricName);
+    if (metricSelected) {
+      if (this.props.onAddMetric) {
+        this.props.onRemoveMetric(metricName);
+      }
+    } else {
+      if (this.props.onAddMetric) {
+        this.props.onAddMetric(metricName);
+      }
+    }
+  }
+
+  handleClickNumber(nodePath, metricName) {
+    this.props.onSelectTS();
+    this.props.onAddMetric(metricName);
+    this.props.onSelect(nodePath);
   }
 
   flatten(nodeTree) {
@@ -94,7 +127,7 @@ class TreeTable extends Component {
         path: pathToThis,
         hovered: nodeIsHovered,
         collapsed: nodeCollapsed,
-        selected: nodeSelected || parentSelected,
+        selected: nodeSelected,
         stats: getStats(node, strPathToThis)
       });
       if (node.type !== TYPE_NODE && !nodeCollapsed) {
@@ -108,15 +141,17 @@ class TreeTable extends Component {
   }
 
   render() {
-    const { nodes } = this.props;
+    const { nodes, showCheckboxes, selectedMetrics } = this.props;
 
     const flattenedNodes = this.flatten(nodes);
 
-    const handleToggle = this.handleToggle.bind(this);
+    const handleToggleNode = this.handleToggleNode.bind(this);
     const handleHover = this.handleHover.bind(this);
     const handleUnHover = this.handleUnHover.bind(this);
     const handleSelect = this.handleSelect.bind(this);
     const handleUnSelect = this.handleUnSelect.bind(this);
+    const handleClickHeader = this.handleClickHeader.bind(this);
+    const handleClickNumber = this.handleClickNumber.bind(this);
 
     return (
       <table className="table-compact treetable">
@@ -124,12 +159,23 @@ class TreeTable extends Component {
           <tr>
             <th></th>
             <th style={{ width: 300 }}>Name</th>
-            <th>CPU</th>
-            <th>QPS</th>
-            <th>GB Used</th>
-            <th>GB Capacity</th>
-            <th>% GB Used</th>
-            <th># Ranges</th>
+            {METRICS.map((metric) => (
+              <th
+                className="metric-name"
+                key={metric.name}
+                onClick={() => handleClickHeader(metric.name)}>
+                {showCheckboxes
+                  ? <span>
+                      <input
+                        type="checkbox"
+                        checked={selectedMetrics.has(metric.name)}
+                      />
+                      {' '}
+                    </span>
+                  : null}
+                {metric.name}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
@@ -137,11 +183,12 @@ class TreeTable extends Component {
             <Node
               key={flattenedNode.path.join('-')}
               flattenedNode={flattenedNode}
-              onToggleCollapsed={handleToggle}
+              onToggleCollapsed={handleToggleNode}
               onHover={handleHover}
               onUnHover={handleUnHover}
               onSelect={handleSelect}
               onUnSelect={handleUnSelect}
+              onClickMetric={(metric) => handleClickNumber(flattenedNode.path, metric)}
             />
           ))}
         </tbody>
@@ -162,7 +209,8 @@ class Node extends Component {
       onHover,
       onUnHover,
       onSelect,
-      onUnSelect
+      onUnSelect,
+      onClickMetric
     } = this.props;
     const { node, depth, path } = flattenedNode;
 
@@ -207,12 +255,15 @@ class Node extends Component {
         >
           {arrow}{node.name}
         </td>
-        <td className="treetable-stat">{node.type === TYPE_NODE ? `${Math.round(stats.CPU)}%` : ''}</td>
-        <td className="treetable-stat">{Math.round(stats.QPS)}</td>
-        <td className="treetable-stat">{Math.round(stats.gbUsed)}</td>
-        <td className="treetable-stat">{Math.round(stats.gbCapacity)}</td>
-        <td className="treetable-stat">{Math.floor(stats.gbUsed / stats.gbCapacity * 100)}</td>
-        <td className="treetable-stat">{stats.ranges}</td>
+        {METRICS.map((metric) => (
+          <td
+            key={metric.name}
+            className="treetable-stat"
+            onClick={() => onClickMetric(metric.name)}
+          >
+            {metric.extract(stats, node)}
+          </td>
+        ))}
       </tr>
     );
   }

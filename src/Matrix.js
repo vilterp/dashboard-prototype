@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { stringifyPath } from './nodes';
+import { stringifyPath, unStringifyPath } from './nodes';
 import classNames from 'classnames';
 import './Matrix.css';
 
@@ -19,7 +19,7 @@ class Matrix extends Component {
 
   render() {
     const { selectedNodes: selectedSet, hoveredNodes } = this.props;
-    const selectedNodes = Array.from(selectedSet);
+    const selectedNodes = Array.from(selectedSet).map(unStringifyPath);
 
     if (selectedNodes.length === 0) {
       return (
@@ -81,7 +81,7 @@ class Matrix extends Component {
 }
 
 function nodeName(path) {
-  return path[path.length-1];
+  return path.join('/');
 }
 
 export default Matrix;
