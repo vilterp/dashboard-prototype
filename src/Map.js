@@ -4,19 +4,10 @@ import { stringifyPath, unStringifyPath, pathHasPrefix } from './nodes';
 import worldBoundaries from './assets/world';
 import * as Cities from './assets/cities100000';
 import * as d3 from 'd3';
-
 import './Map.css';
 
-const proj = d3.geoNaturalEarth1().scale(80);
-const geoPath = d3.geoPath(proj);
 const graticule = d3.geoGraticule();
 const outline = graticule.outline();
-
-function coordsForCity(cityName) {
-  const city = Cities.byName[cityName];
-  const res = proj([city.latitude, city.longitude]);
-  return res;
-}
 
 const WIDTH = 800;
 const HEIGHT = 400;
@@ -28,6 +19,7 @@ class WorldBoundaries extends Component {
   }
 
   render() {
+    const geoPath = d3.geoPath(this.props.proj);
     return (
       <g>
         <g className="world-boundaries">
@@ -48,6 +40,22 @@ class WorldBoundaries extends Component {
 }
 
 class Map extends Component {
+
+  constructor() {
+    super();
+    this.state = {
+      proj: d3.geoNaturalEarth1()
+        .scale(100)
+        .translate([WIDTH/2, HEIGHT/2])
+    };
+  }
+
+  coordsForCity(cityName) {
+    const city = Cities.byName[cityName];
+    const res = this.state.proj([city.longitude, city.latitude]);
+    console.log(city, res);
+    return res;
+  }
 
   handleClick(path) {
     if (this.props.onClick) {
@@ -75,33 +83,35 @@ class Map extends Component {
     const handleUnHover = this.handleUnHover.bind(this);
 
     return (
-      <svg width={WIDTH} height={HEIGHT}>
-        <WorldBoundaries />
+      <div>
+        <svg width={WIDTH} height={HEIGHT}>
+          <WorldBoundaries proj={this.state.proj} />
 
-        <g className="nodes">
-          {nodes.map((node) => {
-            const [x, y] = coordsForCity(node.cityName);
-            const name = node.path[node.path.length - 1];
-            const isSelected = this.props.selectedNodes.has(stringifyPath(node.path));
-            const isHovered = Array.from(hoveredNodes).some((hoveredPath) => (
-              pathHasPrefix(unStringifyPath(hoveredPath), node.path)
-            ))
-            return (
-              <g
-                key={stringifyPath(node.path)}
-                style={{ cursor: 'pointer' }}
-                className={classNames('map-node', { selected: isSelected, hovered: isHovered })}
-                onClick={() => handleClick(node.path)}
-                onMouseOver={() => { handleHover(node.path) }}
-                onMouseOut={() => handleUnHover(node.path)}
-              >
-                <circle r="10" cx={x} cy={y} />
-                <text x={x} y={y + 30} textAnchor="middle">{name}</text>
-              </g>
-            );
-          })}
-        </g>
-      </svg>
+          <g className="nodes">
+            {nodes.map((node) => {
+              const [x, y] = this.coordsForCity(node.cityName);
+              const name = node.path[node.path.length - 1];
+              const isSelected = this.props.selectedNodes.has(stringifyPath(node.path));
+              const isHovered = Array.from(hoveredNodes).some((hoveredPath) => (
+                pathHasPrefix(unStringifyPath(hoveredPath), node.path)
+              ))
+              return (
+                <g
+                  key={stringifyPath(node.path)}
+                  style={{ cursor: 'pointer' }}
+                  className={classNames('map-node', { selected: isSelected, hovered: isHovered })}
+                  onClick={() => handleClick(node.path)}
+                  onMouseOver={() => { handleHover(node.path) }}
+                  onMouseOut={() => handleUnHover(node.path)}
+                >
+                  <circle r="15" cx={x} cy={y} />
+                  <text x={x} y={y} textAnchor="middle" alignmentBaseline="middle">{name}</text>
+                </g>
+              );
+            })}
+          </g>
+        </svg>
+      </div>
     );
   }
 

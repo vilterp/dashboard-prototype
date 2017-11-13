@@ -34,8 +34,8 @@ const nodesForTesting = [
     cityName: 'Berlin'
   },
   {
-    path: ['Cluster', 'China', 'Beijing'],
-    cityName: 'Beijing'
+    path: ['Cluster', 'JP'],
+    cityName: 'Tokyo'
   }
 ];
 

@@ -177,6 +177,24 @@ const nodeTree = {
         }
       ]
     },
+    {
+      type: TYPE_LOCALITY,
+      name: 'JP',
+      cityName: 'Tokyo',
+      children: [
+        {
+          type: TYPE_NODE,
+          name: '12.42.56.128',
+          stats: {
+            CPU: Math.random() * 100,
+            QPS: Math.random() * 50,
+            gbUsed: Math.random() * 256,
+            gbCapacity: 256,
+            ranges: Math.round(Math.random() * 1000)
+          }
+        }
+      ]
+    }
   ]
 };
 
