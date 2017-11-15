@@ -6,7 +6,7 @@
   cursor: pointer;
 }
 
-.treetable-node.locality .treetable-node-name {
+.treetable-node.locality {
   font-weight: bold;
 }
 
