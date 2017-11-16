@@ -252,9 +252,12 @@ export function stateFromUrl(url) {
     hoveredNodes: new Set(),
     selectedNodes: new Set(),
     selectedMetrics: new Set()
-  }
+  };
   if (segments.length > 0 && segments[0].length > 0) {
-    result.tab = segments[0].toUpperCase();
+    const tab = segments[0].toUpperCase();
+    if (_.has(TAB_MAP, tab)) {
+      result.tab = tab;
+    }
   }
   if (segments.length > 1 && segments[1].length > 0) {
     const selected = segments[1].split(';');
